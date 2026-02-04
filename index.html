@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virus RNA Translation Comparison</title>
+<style>body{margin:0;padding:20px;font-family:system-ui,-apple-system,sans-serif;background:#fff;color:#333}.container{max-width:1000px;margin:auto}.header{text-align:center;margin-bottom:30px;border-bottom:2px solid #f0f0f0;padding-bottom:15px}.header h1{margin:0;font-size:1.8rem;color:#2c3e50}.header p{color:#7f8c8d;margin:10px 0 0}.split-screen{display:flex;flex-wrap:wrap;gap:30px;margin-bottom:30px}.panel{flex:1;min-width:300px;border:1px solid #e1e8ed;border-radius:12px;padding:20px;background:#fafafa;box-shadow:0 4px 6px rgba(0,0,0,0.03)}.panel-title{text-align:center;margin:0 0 20px;font-size:1.3rem;color:#2c3e50;padding-bottom:10px;border-bottom:1px solid #e1e8ed}.virus-model{position:relative;height:250px;margin:20px auto;width:250px}.virus-core{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100px;height:100px}.rna-segment{position:absolute;border-radius:50%;opacity:0.8;transition:all 0.8s ease}.capsid{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;border:2px solid #7f8c8d;width:130px;height:130px}.matrix{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;border:4px solid #95a5a6;width:180px;height:180px}.glycoprotein{position:absolute;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:20px solid #e74c3c}.ribosome-container{text-align:center;margin:30px 0}.ribosome{width:60px;height:60px;background:#9b59b6;border-radius:50%;margin:auto;cursor:grab;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.9rem;user-select:none;box-shadow:0 4px 8px rgba(0,0,0,0.2);transition:transform 0.5s ease}.ribosome:active{cursor:grabbing}.output-area{min-height:100px;margin:20px 0;padding:15px;border:1px dashed #ddd;border-radius:8px;background:#f8f9fa}.output-text{text-align:center;font-size:1.1rem;color:#2c3e50;margin:0}.graph-container{height:120px;margin:20px 0;position:relative;overflow:hidden}.graph-label{text-align:center;font-weight:600;color:#27ae60;margin-bottom:8px}.graph-line{position:absolute;bottom:20px;width:100%;height:3px;background:#27ae60;transform:scaleX(0);transform-origin:left;transition:transform 1.5s ease}.graph-points{display:flex;justify-content:space-around;position:absolute;bottom:15px;width:100%}.graph-point{width:12px;height:12px;background:#27ae60;border-radius:50%;opacity:0;transform:translateY(20px);transition:all 0.8s ease}.controls{text-align:center;margin-top:30px}.btn{background:#3498db;color:white;border:none;padding:12px 24px;border-radius:6px;cursor:pointer;font-size:1rem;margin:0 10px;transition:background 0.3s}.btn:hover{background:#2980b9}.btn-convert{background:#e67e22}.btn-convert:hover{background:#d35400}.btn-reset{background:#95a5a6}.btn-reset:hover{background:#7f8c8d}.hidden{display:none}.placeholder-section{margin-top:40px;padding-top:20px;border-top:2px dashed #bdc3c7;text-align:center}.placeholder-btn{background:#ecf0f1;color:#7f8c8d;border:2px dashed #bdc3c7;padding:15px 30px;font-size:1.1rem;border-radius:8px;cursor:not-allowed}.highlight{stroke:#2ecc71 !important;stroke-width:3px !important;filter:drop-shadow(0 0 5px #2ecc71)}@media (max-width:768px){.split-screen{gap:20px}.panel{min-width:100%}.virus-model{width:200px;height:200px}.header h1{font-size:1.5rem}}</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>Viral RNA Translation Comparison</h1>
+<p>Compare how Influenza and HIV viruses use their RNA genomes for protein synthesis</p>
+</div>
+<div class="split-screen">
+<div class="panel">
+<h2 class="panel-title">Influenza Virus</h2>
+<div class="virus-model" id="flu-virus">
+<div class="matrix"></div>
+<div class="capsid"></div>
+<div class="virus-core" id="flu-core">
+<svg viewBox="0 0 100 100" width="100" height="100" id="flu-rna">
+<circle cx="50" cy="50" r="45" fill="none" stroke="#e67e22" stroke-width="2" stroke-dasharray="5,2"/>
+</svg>
+</div>
+</div>
+<div class="graph-container hidden" id="flu-graph">
+<div class="graph-label">Viral Protein Synthesis</div>
+<div class="graph-line" id="flu-line"></div>
+<div class="graph-points">
+<div class="graph-point" id="flu-point1"></div>
+<div class="graph-point" id="flu-point2"></div>
+<div class="graph-point" id="flu-point3"></div>
+<div class="graph-point" id="flu-point4"></div>
+</div>
+</div>
+<div class="controls">
+<button class="btn btn-convert hidden" id="flu-convert">Convert RNA Segment</button>
+</div>
+</div>
+<div class="panel">
+<h2 class="panel-title">HIV</h2>
+<div class="virus-model" id="hiv-virus">
+<div class="matrix"></div>
+<div class="capsid"></div>
+<div class="virus-core" id="hiv-core">
+<svg viewBox="0 0 100 100" width="100" height="100" id="hiv-rna">
+<circle cx="50" cy="50" r="45" fill="none" stroke="#3498db" stroke-width="2" stroke-dasharray="3,3"/>
+</svg>
+</div>
+</div>
+<div class="graph-container hidden" id="hiv-graph">
+<div class="graph-label">Viral Protein Synthesis</div>
+<div class="graph-line" id="hiv-line"></div>
+<div class="graph-points">
+<div class="graph-point" id="hiv-point1"></div>
+<div class="graph-point" id="hiv-point2"></div>
+<div class="graph-point" id="hiv-point3"></div>
+<div class="graph-point" id="hiv-point4"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="ribosome-container">
+<div class="ribosome" id="ribosome" draggable="true">Ribosome</div>
+<p style="color:#7f8c8d;margin-top:10px">Drag the ribosome onto a virus model</p>
+</div>
+<div class="output-area">
+<p class="output-text" id="output">Drag ribosome to begin interaction</p>
+</div>
+<div class="controls">
+<button class="btn btn-reset" id="reset">Reset Simulation</button>
+</div>
+<div class="placeholder-section">
+<button class="placeholder-btn">Genome Replication (Future Development)</button>
+</div>
+</div>
+<script>(function(){'use strict';var b=document.getElementById('ribosome');var g=document.getElementById('flu-core');var h=document.getElementById('hiv-core');var i=document.getElementById('output');var j=document.getElementById('flu-convert');var k=document.getElementById('reset');var l=document.getElementById('flu-graph');var m=document.getElementById('hiv-graph');var n=document.getElementById('flu-rna');var o=document.getElementById('hiv-rna');var p=!1;var q=!1;var r=!1;function s(){p=!1;q=!1;r=!1;b.style.transform='translate(0,0)';b.style.background='#9b59b6';b.style.cursor='grab';i.textContent='Drag ribosome to begin interaction';j.classList.add('hidden');l.classList.add('hidden');m.classList.add('hidden');var t=n.querySelectorAll('.rna-segment');t.forEach(function(u){u.remove()});var v=o.querySelectorAll('.rna-segment');v.forEach(function(u){u.remove()});a();w()}function a(){for(var x=0;x<8;x++){var y=document.createElementNS('http://www.w3.org/2000/svg','circle');var z=40+Math.random()*15;var A=50+z*Math.cos(x*Math.PI/4);var B=50+z*Math.sin(x*Math.PI/4);y.setAttribute('cx',A);y.setAttribute('cy',B);y.setAttribute('r','4');y.setAttribute('fill','#e67e22');y.setAttribute('stroke','#d35400');y.setAttribute('stroke-width','1');y.setAttribute('class','rna-segment');n.appendChild(y)}}function w(){for(var x=0;x<2;x++){var y=document.createElementNS('http://www.w3.org/2000/svg','circle');var z=35+x*15;var A=50+z*Math.cos(x*Math.PI);var B=50+z*Math.sin(x*Math.PI);y.setAttribute('cx',A);y.setAttribute('cy',B);y.setAttribute('r','6');y.setAttribute('fill','#3498db');y.setAttribute('stroke','#2980b9');y.setAttribute('stroke-width','1');y.setAttribute('class','rna-segment');o.appendChild(y)}}function C(D){var E=D.clientX-b.offsetWidth/2;var F=D.clientY-b.offsetHeight/2;b.style.position='fixed';b.style.left=E+'px';b.style.top=F+'px';b.style.cursor='grabbing'}function G(){b.style.position='';b.style.left='';b.style.top='';var H=b.getBoundingClientRect();var I=g.getBoundingClientRect();var J=h.getBoundingClientRect();var K=I.left+H.width/2;var L=I.top+H.height/2;var M=J.left+H.width/2;var N=J.top+H.height/2;var O=H.left+H.width/2;var P=H.top+H.height/2;var Q=Math.sqrt(Math.pow(O-I.left-I.width/2,2)+Math.pow(P-I.top-I.height/2,2));var R=Math.sqrt(Math.pow(O-J.left-J.width/2,2)+Math.pow(P-J.top-J.height/2,2));if(Q<80&&!p){p=!0;b.style.transform='translate('+(K-O)+'px,'+(L-P)+'px)';b.style.background='#8e44ad';setTimeout(function(){i.textContent='Influenza: Negative-sense RNA cannot be read by ribosomes.';j.classList.remove('hidden')},800)}else if(R<80&&!q){q=!0;b.style.transform='translate('+(M-O)+'px,'+(N-P)+'px)';b.style.background='#8e44ad';setTimeout(function(){i.textContent='HIV: Positive-sense RNA genome is directly translated.';S()},800)}else{b.style.transform='translate(0,0)';b.style.background='#9b59b6'}}function S(){m.classList.remove('hidden');setTimeout(function(){document.getElementById('hiv-line').style.transform='scaleX(1)';var T=document.querySelectorAll('#hiv-graph .graph-point');T.forEach(function(U,V){setTimeout(function(){U.style.opacity='1';U.style.transform='translateY(0)'},V*300)})},100);var V=o.querySelectorAll('.rna-segment')[0];V.setAttribute('class','rna-segment highlight');setTimeout(function(){V.setAttribute('stroke','#2ecc71');V.setAttribute('stroke-width','3')},200)}function T(){if(!r){r=!0;var U=n.querySelectorAll('.rna-segment')[3];U.setAttribute('fill','#2ecc71');U.setAttribute('stroke','#27ae60');setTimeout(function(){i.textContent='Influenza: Positive-sense RNA converted from negative-sense template can now be translated.';V()},800)}}function V(){l.classList.remove('hidden');setTimeout(function(){document.getElementById('flu-line').style.transform='scaleX(1)';var W=document.querySelectorAll('#flu-graph .graph-point');W.forEach(function(X,Y){setTimeout(function(){X.style.opacity='1';X.style.transform='translateY(0)'},Y*300)})},100)}b.addEventListener('dragstart',function(D){C(D)});document.addEventListener('dragover',function(D){D.preventDefault()});document.addEventListener('drop',function(D){D.preventDefault();G()});j.addEventListener('click',T);k.addEventListener('click',s);function W(){var X=document.querySelectorAll('.glycoprotein');X.forEach(function(Y){Y.remove()});for(var Z=0;Z<16;Z++){var _=document.createElement('div');_.className='glycoprotein';var $=180/2;var aa=15+Math.random()*20;var ba=Z*(2*Math.PI/16);var ca=$+($-30)*Math.cos(ba);var da=$+($-30)*Math.sin(ba);_.style.left=ca+'px';_.style.top=da+'px';_.style.transform='rotate('+(ba*180/Math.PI)+'deg)';document.getElementById('flu-virus').appendChild(_);document.getElementById('hiv-virus').appendChild(_.cloneNode(!0))}}W();a();w()})();</script>
+</body>
+</html>
