@@ -3,123 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Virus Interactive</title>
+    <title>Biology@RI - Virus Interactive</title>
     <style>
-        :root { --bg: #0f172a; --text: #f8fafc; --accent: #38bdf8; --dim: rgba(248, 250, 252, 0.25); }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: start; min-height: 100vh; overflow-x: hidden; touch-action: manipulation; }
-        header { text-align: center; margin: 2rem 0; }
-        h1 { margin: 0; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; font-size: 1.5rem; }
-        h2 { margin: 0; font-weight: 600; font-size: 1.8rem; }
-        h3 { margin: 0; font-size: 90%; color: var(--dim); font-weight: 400; }
-        .stage { width: 90%; max-width: 400px; display: flex; flex-direction: column; gap: 20px; margin-bottom: 2rem; }
-        .cell { border: 1px solid var(--dim); border-radius: 12px; padding: 15px; background: rgba(255,255,255,0.03); position: relative; }
-        .label { font-size: 0.7rem; color: var(--accent); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .genome { height: 60px; border: 2px dashed var(--dim); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: all 0.3s; }
-        .genome.active { border-color: var(--accent); background: rgba(56, 189, 248, 0.1); }
-        .tray { width: 90%; max-width: 400px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; display: flex; justify-content: space-around; gap: 10px; }
-        .item { padding: 10px 15px; background: var(--text); color: var(--bg); border-radius: 20px; font-weight: bold; font-size: 0.8rem; cursor: grab; user-select: none; touch-action: none; z-index: 10; }
-        .info { width: 90%; max-width: 400px; font-size: 0.85rem; line-height: 1.4; color: #94a3b8; text-align: center; min-height: 80px; margin-top: 10px; }
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+        :root { --dim: rgba(0,0,0,0.25); --bg: #ffffff; --txt: #000000; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: none; }
+        body { 
+            background: var(--bg); color: var(--txt); font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+        }
+        
+        header { text-align: center; padding: 20px 10px; width: 100%; }
+        .t1 { font-size: 1.8rem; font-weight: 800; margin: 0; }
+        .t2 { font-size: 1.1rem; font-weight: 400; margin: 5px 0; }
+        .t3 { font-size: 0.65rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+
+        .stage { 
+            display: flex; width: 100%; max-width: 500px; flex: 1; 
+            justify-content: space-around; align-items: flex-start; padding-top: 20px;
+        }
+        
+        .v-col { display: flex; flex-direction: column; align-items: center; width: 32%; }
+        .v-label { font-size: 0.6rem; font-weight: bold; margin-bottom: 10px; height: 30px; text-align: center; }
+
+        .virus-svg { width: 90px; height: 90px; cursor: pointer; }
+        .envelope { stroke: #ccc; stroke-width: 4; fill: none; transition: opacity 0.5s; }
+        .capsid { stroke: #999; stroke-width: 2; fill: none; transition: opacity 0.5s; }
+        .genome { fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+        .tray { 
+            width: 100%; background: #f9f9f9; padding: 20px 10px; 
+            display: flex; justify-content: center; gap: 15px; border-top: 1px solid #eee;
+        }
+        .tool { 
+            padding: 10px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: bold;
+            background: #fff; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            z-index: 100; pointer-events: auto;
+        }
+
+        #feedback { 
+            padding: 15px; font-size: 0.75rem; text-align: center; min-height: 60px; 
+            color: #444; width: 100%; max-width: 400px;
+        }
+
+        footer { font-size: 0.65rem; color: var(--dim); padding: 15px; }
+
+        /* Animation classes */
+        .hidden { opacity: 0; pointer-events: none; }
+        .assembling { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.2; } 50% { opacity: 0.8; } 100% { opacity: 0.2; } }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Virus</h1>
-    <h2>Flu Virus vs HIV</h2>
-    <h3>Transcription, translation</h3>
+    <div class="t1">Virus</div>
+    <div class="t2">Types of genome and replication</div>
+    <div class="t3">Biology@RI</div>
 </header>
 
+<div id="feedback">Drag a molecule onto a virus to explore its replication cycle.</div>
+
 <div class="stage">
-    <div class="cell" id="flu-cell">
-        <div class="label">Flu Virus (-ssRNA)</div>
-        <div class="genome" id="flu-target" data-type="flu">Drop Enzyme Here</div>
+    <div class="v-col">
+        <div class="v-label">Virus A<br>(+ssRNA)</div>
+        <svg class="virus-svg" id="vA" viewBox="0 0 100 100">
+            <circle class="envelope" cx="50" cy="50" r="45" />
+            <circle class="capsid" cx="50" cy="50" r="30" />
+            <path class="genome" d="M40,50 Q45,40 50,50 T60,50" stroke="#2ecc71" />
+        </svg>
     </div>
-    <div class="cell" id="hiv-cell">
-        <div class="label">HIV Virus (+ssRNA)</div>
-        <div class="genome" id="hiv-target" data-type="hiv">Drop Enzyme Here</div>
+    <div class="v-col">
+        <div class="v-label">Virus B<br>(-ssRNA)</div>
+        <svg class="virus-svg" id="vB" viewBox="0 0 100 100">
+            <circle class="envelope" cx="50" cy="50" r="45" />
+            <circle class="capsid" cx="50" cy="50" r="30" />
+            <path class="genome" d="M35,45 Q40,35 45,45 T55,45 T65,45" stroke="#e74c3c" />
+        </svg>
+    </div>
+    <div class="v-col">
+        <div class="v-label">Virus C<br>(dsDNA)</div>
+        <svg class="virus-svg" id="vC" viewBox="0 0 100 100">
+            <circle class="envelope" cx="50" cy="50" r="45" />
+            <circle class="capsid" cx="50" cy="50" r="30" />
+            <path class="genome" d="M35,48 Q45,38 55,48 T75,48" stroke="#3498db" />
+            <path class="genome" d="M35,52 Q45,42 55,52 T75,52" stroke="#2980b9" />
+        </svg>
     </div>
 </div>
 
-<div class="tray" id="tray">
-    <div class="item" id="rdrp" data-part="viral_rdrp">Viral RdRp</div>
-    <div class="item" id="ribosome" data-part="host_ribosome">Host Ribosome</div>
+<div class="tray">
+    <div class="tool" id="t_rdrp" data-type="rdrp">Viral RdRp</div>
+    <div class="tool" id="t_ribo" data-type="ribo">Host Ribosome</div>
+    <div class="tool" id="t_dtrp" data-type="dtrp">Host RNA Pol</div>
 </div>
 
-<div class="info" id="info-box">Drag a component to the correct viral genome to begin.</div>
-
-<div id="overlay"></div>
+<footer class="t3">All rights reserved</footer>
 
 <script>
-/* Obfuscated Core Logic */
-(function(_0x1,_0x2){const _0x3=function(_0x4){while(--_0x4){_0x1['push'](_0x1['shift']());}};_0x3(++_0x2);}(['data-part','info-box','host_ribosome','Target','innerHTML','flu-target','hiv-target','style','color','Viral RdRp is required to convert -ssRNA to +ssRNA because host cells lack enzymes that use RNA as a template.','Host Ribosomes bind directly to +ssRNA. Translation occurs immediately without conversion.','viral_rdrp','#38bdf8','#ef4444','getBoundingClientRect','addEventListener','touchstart','touchmove','touchend','clientX','clientY'],0x1b4));const _0x5=function(_0x1,_0x2){const _0x3=['data-part','info-box','host_ribosome','Target','innerHTML','flu-target','hiv-target','style','color','Viral RdRp is required to convert -ssRNA to +ssRNA because host cells lack enzymes that use RNA as a template.','Host Ribosomes bind directly to +ssRNA. Translation occurs immediately without conversion.','viral_rdrp','#38bdf8','#ef4444','getBoundingClientRect','addEventListener','touchstart','touchmove','touchend','clientX','clientY'];return _0x3[_0x1];};
+/**
+ * OBFUSCATED LOGIC CORE
+ * Prevents easy modification/copying of scientific rules.
+ */
+const _0x51=[
+    '616374697665','706f696e746572646f776e','706f696e7465726d6f7665','706f696e7465727570',
+    '646174612d74797065','7641','7642','7643','7269626f','72647270','64747270'
+];
+const _0x42 = k => decodeURIComponent(k.replace(/.{2}/g, '%$1'));
 
-let activeItem = null;
-let offset = { x: 0, y: 0 };
-const items = document.querySelectorAll('.item');
-const info = document.getElementById('info-box');
+let activeNode = null;
+let startX, startY;
 
-items.forEach(item => {
-    item.addEventListener('touchstart', (e) => {
-        activeItem = item;
-        const touch = e.touches[0];
-        const rect = item.getBoundingClientRect();
-        offset.x = touch.clientX - rect.left;
-        offset.y = touch.clientY - rect.top;
-        item.style.position = 'fixed';
-        item.style.width = (rect.width) + 'px';
-        moveAt(touch.clientX, touch.clientY);
-    });
+const tools = document.querySelectorAll('.tool');
+const feedback = document.getElementById('feedback');
 
-    document.addEventListener('touchmove', (e) => {
-        if (!activeItem) return;
-        const touch = e.touches[0];
-        moveAt(touch.clientX, touch.clientY);
-    });
-
-    document.addEventListener('touchend', (e) => {
-        if (!activeItem) return;
-        const touch = e.changedTouches[0];
-        checkDrop(touch.clientX, touch.clientY);
-        resetItem();
-    });
+tools.forEach(t => {
+    t.addEventListener('pointerdown', startDrag);
 });
 
+function startDrag(e) {
+    activeNode = e.currentTarget;
+    const rect = activeNode.getBoundingClientRect();
+    startX = e.clientX - rect.left;
+    startY = e.clientY - rect.top;
+    activeNode.style.position = 'fixed';
+    activeNode.style.zIndex = '1000';
+    moveAt(e.clientX, e.clientY);
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onEnd);
+}
+
+function onMove(e) { if (activeNode) moveAt(e.clientX, e.clientY); }
+
 function moveAt(x, y) {
-    activeItem.style.left = (x - offset.x) + 'px';
-    activeItem.style.top = (y - offset.y) + 'px';
+    activeNode.style.left = (x - startX) + 'px';
+    activeNode.style.top = (y - startY) + 'px';
 }
 
-function resetItem() {
-    activeItem.style.position = 'static';
-    activeItem.style.width = 'auto';
-    activeItem = null;
-}
-
-function checkDrop(x, y) {
-    const targets = ['flu-target', 'hiv-target'];
-    const part = activeItem.getAttribute('data-part');
+function onEnd(e) {
+    if (!activeNode) return;
+    activeNode.style.display = 'none';
+    const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
+    activeNode.style.display = 'block';
     
-    targets.forEach(tid => {
-        const target = document.getElementById(tid);
-        const rect = target.getBoundingClientRect();
-        if (x > rect.left && x < rect.right && y > rect.top && y < rect.bottom) {
-            if (tid === 'flu-target' && part === 'viral_rdrp') {
-                target.innerHTML = "Converted to +RNA";
-                target.style.borderColor = "#38bdf8";
-                info.innerHTML = "<b>Correct:</b> Flu is -ssRNA. It brings its own RdRp because human cells have no enzyme that uses RNA as a template for transcription.";
-                info.style.color = "#38bdf8";
-            } else if (tid === 'hiv-target' && part === 'host_ribosome') {
-                target.innerHTML = "Translation Active";
-                target.style.borderColor = "#38bdf8";
-                info.innerHTML = "<b>Correct:</b> HIV is +ssRNA. It mimics host mRNA, allowing host ribosomes to bind and translate it into protein directly.";
-                info.style.color = "#38bdf8";
-            } else {
-                info.innerHTML = "That component doesn't fit here. Think about the RNA polarity and enzyme source.";
-                info.style.color = "#ef4444";
-            }
+    const virus = dropTarget ? dropTarget.closest('.virus-svg') : null;
+    if (virus) {
+        processLogic(virus.id, activeNode.getAttribute(_0x42(_0x5[4])));
+    }
+
+    activeNode.style.position = 'static';
+    activeNode.style.zIndex = 'auto';
+    activeNode = null;
+    document.removeEventListener('pointermove', onMove);
+    document.removeEventListener('pointerup', onEnd);
+}
+
+function processLogic(vId, toolType) {
+    const v = document.getElementById(vId);
+    // Remove layers
+    v.querySelector('.envelope').classList.add('hidden');
+    v.querySelector('.capsid').classList.add('hidden');
+
+    // Science Logic mapping
+    if (vId === _0x42(_0x5[5])) { // Virus A (+RNA)
+        if (toolType === _0x42(_0x5[8])) {
+            success(v, "<b>+ssRNA:</b> Ribosomes bind directly to translate proteins. Viral RdRp is then used to replicate the genome via a negative intermediate.");
+        } else {
+            fail("Host enzymes cannot read RNA. +ssRNA needs a Ribosome first.");
         }
-    });
+    } else if (vId === _0x42(_0x5[6])) { // Virus B (-RNA)
+        if (toolType === _0x42(_0x5[9])) {
+            success(v, "<b>-ssRNA:</b> Must use Viral RdRp to create a (+) template. Host lacks RNA-dependent-RNA-Pol. Ribosomes then translate the (+) strand.");
+        } else {
+            fail("Ribosomes cannot translate (-) antisense RNA directly. Use Viral RdRp first.");
+        }
+    } else if (vId === _0x42(_0x5[7])) { // Virus C (DNA)
+        if (toolType === _0x42(_0x5[10])) {
+            success(v, "<b>dsDNA:</b> Uses Host RNA Polymerase (DNA-dependent) to transcribe mRNA, which is then translated by host ribosomes.");
+        } else {
+            fail("This is DNA. It requires a DNA-dependent RNA Polymerase from the host.");
+        }
+    }
+}
+
+function success(v, txt) {
+    feedback.innerHTML = txt;
+    feedback.style.color = "#27ae60";
+    setTimeout(() => {
+        v.querySelector('.envelope').classList.remove('hidden');
+        v.querySelector('.capsid').classList.remove('hidden');
+        v.querySelector('.envelope').classList.add('assembling');
+        v.querySelector('.capsid').classList.add('assembling');
+    }, 1000);
+}
+
+function fail(txt) {
+    feedback.innerHTML = txt;
+    feedback.style.color = "#c0392b";
 }
 </script>
 </body>
